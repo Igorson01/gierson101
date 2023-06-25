@@ -1,3 +1,4 @@
+// tutaj tworzymy klase naszej postaci
 class Player {
     constructor(x, y, radius, color) {
         this.x = x

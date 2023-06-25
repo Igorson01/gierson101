@@ -1,3 +1,4 @@
+// tutaj tworzymy klase naszych pocisków
 class Projectile {
     constructor(x, y, radius, color, velocity) {
         this.x = x

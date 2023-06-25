@@ -1,3 +1,4 @@
+// tutaj tworzymy klase naszych przeciwników 
 class Enemy {
     constructor(x, y, radius, color, velocity) {
         this.x = x

@@ -1,9 +1,65 @@
 <style>
     body{
         margin:0;
+        cursor: crosshair;
+        font-family: sans-serif;
+        background-color: black ;
     }
 </style>
+<div style="position: absolute; 
+            color: white; 
+            padding: 8px;  
+            font-size: 14px; 
+            user-select: none;">
+    <span>Score:<span id="scoreEl">0</span></span>
+</div> 
+<div id="startGameEl" style="
+            position:absolute;
+            background-color: white; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%,-50%); 
+            padding: 16px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            border-radius: 5px;
+            cursor: default;">
+    <h1 style="font-size: 24px; margin-bottom: 0; margin-top: 8px;" >Kulki Game</h1>
+    <button id="startButtonEl" style="margin-top: 12px; 
+                   background-color: blue; 
+                   border: none; 
+                   color: white; 
+                   padding: 8px 16px; 
+                   border-radius: 5px;
+                   cursor: pointer;"
+    >Start</button>
+    </div>
+<div id="modalEl" style=" display: none;
+            position:absolute;
+            background-color: white; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%,-50%); 
+            padding: 16px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            border-radius: 5px;
+            cursor: default;">
+    <label style="font-size: 14px; color: grey;">Game Over </label>
+    <h1 id="modalScoreEl" style="font-size: 48px; margin-bottom: 0; margin-top: 8px;">0</h1>
+    <p style="margin-top: 0; font-size: 14px; color: grey;">Points</p>
+    <button id="buttonEl" style="margin-top: 12px; 
+                   background-color: blue; 
+                   border: none; 
+                   color: white; 
+                   padding: 8px 16px; 
+                   border-radius: 5px;
+                   cursor: pointer;"
+    >Restart Game</button>
+</div>
+
 <canvas></canvas>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js" integrity="sha512-IQLehpLoVS4fNzl7IfH8Iowfm5+RiMGtHykgZJl9AWMgqx0AmJ6cRWcB+GaGVtIsnC4voMfm8f2vwtY+6oPjpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="./classes/particle.js"></script>
 <script src="./classes/enemy.js"></script>

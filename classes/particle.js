@@ -1,4 +1,6 @@
+// friction słuzy do zwalniania naszego wybuchu aby wygladal on bardziej realistycznie i nie rzucal sie po calej mapie gry
 const friction = 0.98
+// tutaj tworzymy klase naszego wybuchu
 class Particle {
     constructor(x, y, radius, color, velocity) {
         this.x = x
