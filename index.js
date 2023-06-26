@@ -9,8 +9,8 @@ const modalScoreEl = document.querySelector('#modalScoreEl')
 const startButtonEl = document.querySelector('#startButtonEl')
 const buttonEl = document.querySelector('#buttonEl')
 
-canvas.width = innerWidth
-canvas.height = innerHeight
+canvas.width = innerWidth - 1
+canvas.height = innerHeight - 1
 
 // stałe naszej postaci
 const x = canvas.width / 2
@@ -67,7 +67,7 @@ function animate() {
     animationId =  requestAnimationFrame(animate)
     c.fillStyle = 'rgba(0,0,0,0.1)'
     c.fillRect(0, 0, canvas.width, canvas.height)
-    player.draw()
+    player.update()
     for(let particlesIndex = particles.length - 1; particlesIndex >= 0; particlesIndex--) {
         const particle = particles[particlesIndex]
     
@@ -208,4 +208,23 @@ startButtonEl.addEventListener('click', () => {
         }
     })
 })
+
+window.addEventListener('keydown', () => {
+    const playerSpeed = 1.5
+    switch(event.key) {
+        case 'd':
+        player.velocity.x += playerSpeed
+        break
+        case 'a':
+        player.velocity.x -= playerSpeed
+        break
+        case 'w':
+        player.velocity.y -= playerSpeed
+        break
+        case 's':
+        player.velocity.y += playerSpeed
+        break
+    }
+})
+
 
