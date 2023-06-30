@@ -12,7 +12,7 @@ class Enemy {
             x,
             y
         }
-
+        // tutaj dajemy szanse na wybranego przeciwnika
         if(Math.random()< 0.5) {
            this.type = 'Homing'
 
@@ -33,7 +33,7 @@ class Enemy {
     }
     update() {
         this.draw()
-
+        // zakrecony przeciwnik
         if(this.type === 'Spinning') {
         this.radians += 0.1
 
@@ -43,7 +43,7 @@ class Enemy {
         this.x = this.center.x + Math.cos(this.radians) * 30
         this.y = this.center.y + Math.sin(this.radians) * 30
         }
-
+        // natretny przeciwnik
         else if(this.type === 'Homing') {
         const angle = Math.atan2(player.y - this.y, player.x - this.x)
         this.velocity.x = Math.cos(angle)
@@ -51,6 +51,7 @@ class Enemy {
 
         this.x = this.x + this.velocity.x
         this.y = this.y + this.velocity.y
+        // natretny i zakrecony przeciwnik ogolnie lipa
         }else if (this.type === 'Homing Spinning') {
             this.radians += 0.1
 

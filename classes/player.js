@@ -9,6 +9,7 @@ class Player {
             x:0,
             y:0
         }
+        this.powerUp
     }
     draw() {
         c.beginPath()
@@ -36,5 +37,6 @@ class Player {
         } else {
             this.velocity.y = 0
         }
+        
     }
 }
