@@ -29,6 +29,9 @@ let score = 0
 let powerUps = []
 let frames = 0
 let backgroundParticles = []
+let game = {
+    active: false
+}
 
 
 function init() {
@@ -42,6 +45,9 @@ function init() {
     scoreEl.innerHTML = score
     frames = 0
     backgroundParticles = []
+    game = {
+        active: true
+    }
 
     const spacing = 30
 
@@ -156,6 +162,7 @@ function animate() {
         powerUp.update()
         const dist = Math.hypot(player.x - powerUp.position.x, player.y - powerUp.position.y)
         if(dist < powerUp.image.height / 2 + player.radius) {
+            PowerUpSound.play()
             powerUps.splice(i,1)
             player.powerUp = 'MachineGun'
             player.color = 'yellow'
@@ -177,9 +184,12 @@ function animate() {
             x: Math.cos(angle) * 6,
             y: Math.sin(angle) * 6
         }
-        if(frames % 2 ===0) { 
+        if(frames % 2 === 0) { 
         projectiles.push( new Projectile(player.x, player.y, radius, color, velocity))
+        } if(frames % 8 === 0) {
+            shootAudio.play()
         }
+
     }
     for(let particlesIndex = particles.length - 1; particlesIndex >= 0; particlesIndex--) {
         const particle = particles[particlesIndex]
@@ -213,8 +223,10 @@ function animate() {
         const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
         // dodajemy warunek przegrania gry, w tym wypadku jest to dotkniecie naszej postaci przez wroga
         if(dist - enemy.radius - player.radius < 1) {
+            Death.play()
             cancelAnimationFrame(animationId)
             clearInterval(intervalId)
+            game.active = false
             modalEl.style.display = 'block'
             gsap.fromTo('#modalEl', {
                 scale:0.8,
@@ -253,6 +265,7 @@ function animate() {
                     scoreEl.innerHTML = score
                     gsap.to(enemy,  {
                         radius: enemy.radius - 10
+
                     })
                     
                         // dzieki splice usuwamy pociski z naszej mapy po zatakowaniu przeciwnika
@@ -262,6 +275,7 @@ function animate() {
                         },
                         score : 69
                     })
+                        DamageTaken.play()
                         projectiles.splice(projectilesIndex, 1)
                 } else {
                 // a tutaj usuwamy przeciwnika i pocisk 
@@ -279,13 +293,14 @@ function animate() {
                     backgroundParticles.forEach(backgroundParticle => {
                         gsap.set(backgroundParticle, {
                             color: 'white',
-                            alpha: 0.4
+                            alpha: 0.2
                         })
                         gsap.to(backgroundParticle, {
                             color: enemy.color,
                             alpha: 0.1
                         })
                     })
+                    Explode.play()
                     enemies.splice(index, 1)
                     projectiles.splice(projectilesIndex, 1)
               }
@@ -295,6 +310,7 @@ function animate() {
 }
 // addeventlistener dzieki ktoremu po kliknieciu myszka na ekranie pojawia sie pocisk ktory zmierza wlasnie w wybranym kierunku
 window.addEventListener('click', (event) => {
+    if(game.active) {
     const projectileRadius = 5
     const projectileColor = 'white'
     const angle = Math.atan2(
@@ -312,6 +328,8 @@ window.addEventListener('click', (event) => {
         projectileColor,
         velocity
     ))
+    shootAudio.play()
+    }
 })
 const mouse = {
     position:{
@@ -325,6 +343,7 @@ addEventListener('mousemove', (event) => {
 })
 // restart gry
 buttonEl.addEventListener('click', () => {
+    Select.play()
     init()
     animate()
     spawnEnemies()
@@ -341,6 +360,7 @@ buttonEl.addEventListener('click', () => {
 })
 // start gry
 startButtonEl.addEventListener('click', () => {
+    Select.play()
     init()
     animate()
     spawnEnemies()
