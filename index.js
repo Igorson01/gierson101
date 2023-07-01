@@ -28,6 +28,7 @@ let intervalId
 let score = 0
 let powerUps = []
 let frames = 0
+let backgroundParticles = []
 
 
 function init() {
@@ -40,6 +41,22 @@ function init() {
     score = 0
     scoreEl.innerHTML = score
     frames = 0
+    backgroundParticles = []
+
+    const spacing = 30
+
+    for(let x = 0; x < canvas.width + spacing; x+=spacing) {
+        for(let y = 0; y < canvas.height + spacing; y+=spacing) { 
+        backgroundParticles.push(
+            new BackgroundParticle({
+            position:{
+                x,
+                y
+            },
+            radius: 3
+        }))
+    }
+    }
 
 }
 
@@ -80,7 +97,26 @@ function spawnPowerUps() {
                 y:0
             }
         }))
-    }, 10000)
+    }, 15000)
+}
+function createScoreLabel({position, score}) {
+    const scoreLabel = document.createElement('label')
+    scoreLabel.innerHTML = score
+    scoreLabel.style.color = 'white'
+    scoreLabel.style.position = 'absolute'
+    scoreLabel.style.left = position.x + 'px'
+    scoreLabel.style.top = position.y + 'px'
+    scoreLabel.style.userSelect = 'none'
+    document.body.appendChild(scoreLabel)
+
+    gsap.to(scoreLabel, {
+        opacity:0,
+        y: -30,
+        duration: 1,
+        onComplete:() => {
+            scoreLabel.parentNode.removeChild(scoreLabel)
+        }
+    })
 }
 
 function animate() {
@@ -88,6 +124,26 @@ function animate() {
     c.fillStyle = 'rgba(0,0,0,0.1)'
     c.fillRect(0, 0, canvas.width, canvas.height)
     frames++
+
+    backgroundParticles.forEach((backgroundParticle) =>{
+        backgroundParticle.draw()
+        
+        const dist = Math.hypot(player.x - backgroundParticle.position.x, player.y - backgroundParticle.position.y)
+
+        if(dist < 100) {
+            backgroundParticle.alpha = 0
+
+            if ( dist > 70) {
+                backgroundParticle.alpha = 0.5
+                
+            }
+        } else if(dist > 100 && backgroundParticle.alpha < 0.1) {
+            backgroundParticle.alpha += 0.01
+        } else if(dist > 100 && backgroundParticle.alpha > 0.1) {
+            backgroundParticle.alpha -= 0.01
+        }
+    })
+
     player.update()
     for (let i = powerUps.length -1; i>=0; i--) {
         const powerUp = powerUps[i]
@@ -200,14 +256,36 @@ function animate() {
                     })
                     
                         // dzieki splice usuwamy pociski z naszej mapy po zatakowaniu przeciwnika
+                        createScoreLabel({position: {
+                            x:projectile.x,
+                            y:projectile.y
+                        },
+                        score : 69
+                    })
                         projectiles.splice(projectilesIndex, 1)
                 } else {
-                // tutaj dodajemy punkty za zniszenie przeciwnika
+                // a tutaj usuwamy przeciwnika i pocisk 
+                //dodajemy punkty za zniszenie przeciwnika
                 score += 420
                 scoreEl.innerHTML = score
+                createScoreLabel({position :{
+                    x: projectile.x,
+                    y: projectile.y
+                },
+                score : 420
+            })
 
-                
-                    // a tutaj usuwamy przeciwnika i pocisk 
+                    //zmieniamy kolor tla 
+                    backgroundParticles.forEach(backgroundParticle => {
+                        gsap.set(backgroundParticle, {
+                            color: 'white',
+                            alpha: 0.4
+                        })
+                        gsap.to(backgroundParticle, {
+                            color: enemy.color,
+                            alpha: 0.1
+                        })
+                    })
                     enemies.splice(index, 1)
                     projectiles.splice(projectilesIndex, 1)
               }
