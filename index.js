@@ -310,6 +310,9 @@ function animate() {
 }
 // addeventlistener dzieki ktoremu po kliknieciu myszka na ekranie pojawia sie pocisk ktory zmierza wlasnie w wybranym kierunku
 window.addEventListener('click', (event) => {
+   if(!backgroundMusic.playing()) {
+    backgroundMusic.play()
+   }
     if(game.active) {
     const projectileRadius = 5
     const projectileColor = 'white'

@@ -22,3 +22,8 @@ const Select = new Howl({
     src: './audio/Select.wav',
     volume: 0.1
 })
+backgroundMusic = new Howl({
+    src: './audio/Hyper.wav',
+    volume: 0.5,
+    loop: true
+})
