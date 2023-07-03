@@ -8,18 +8,19 @@ const startGameEl = document.querySelector('#startGameEl')
 const modalScoreEl = document.querySelector('#modalScoreEl')
 const startButtonEl = document.querySelector('#startButtonEl')
 const buttonEl = document.querySelector('#buttonEl')
+const volumeUpEl = document.querySelector('#volumeUpEl')
+const volumeDownEl = document.querySelector('#volumeDownEl')
 
-canvas.width = innerWidth - 1
-canvas.height = innerHeight - 1
+canvas.width = innerWidth 
+canvas.height = innerHeight 
 
 // stałe naszej postaci
-const x = canvas.width / 2
-const y = canvas.height / 2
+
 const playerRadius = 15
 const playerColor = 'white'
 
 
-let player = new Player(x, y , playerRadius, playerColor)
+let player 
 let projectiles = []
 let enemies = []
 let particles = []
@@ -35,6 +36,9 @@ let game = {
 
 
 function init() {
+    const x = canvas.width / 2
+    const y = canvas.height / 2
+
     player = new Player(x, y , playerRadius, playerColor)
     projectiles = []
     enemies = []
@@ -113,6 +117,7 @@ function createScoreLabel({position, score}) {
     scoreLabel.style.left = position.x + 'px'
     scoreLabel.style.top = position.y + 'px'
     scoreLabel.style.userSelect = 'none'
+    scoreLabel.style.pointerEvents = 'none'
     document.body.appendChild(scoreLabel)
 
     gsap.to(scoreLabel, {
@@ -162,7 +167,7 @@ function animate() {
         powerUp.update()
         const dist = Math.hypot(player.x - powerUp.position.x, player.y - powerUp.position.y)
         if(dist < powerUp.image.height / 2 + player.radius) {
-            PowerUpSound.play()
+            audio.PowerUpSound.play()
             powerUps.splice(i,1)
             player.powerUp = 'MachineGun'
             player.color = 'yellow'
@@ -223,9 +228,10 @@ function animate() {
         const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
         // dodajemy warunek przegrania gry, w tym wypadku jest to dotkniecie naszej postaci przez wroga
         if(dist - enemy.radius - player.radius < 1) {
-            Death.play()
+            audio.Death.play()
             cancelAnimationFrame(animationId)
             clearInterval(intervalId)
+            clearInterval(spawnPowerUpsId)
             game.active = false
             modalEl.style.display = 'block'
             gsap.fromTo('#modalEl', {
@@ -275,7 +281,7 @@ function animate() {
                         },
                         score : 69
                     })
-                        DamageTaken.play()
+                        audio.DamageTaken.play()
                         projectiles.splice(projectilesIndex, 1)
                 } else {
                 // a tutaj usuwamy przeciwnika i pocisk 
@@ -300,7 +306,7 @@ function animate() {
                             alpha: 0.1
                         })
                     })
-                    Explode.play()
+                    audio.Explode.play()
                     enemies.splice(index, 1)
                     projectiles.splice(projectilesIndex, 1)
               }
@@ -309,30 +315,46 @@ function animate() {
     }
 }
 // addeventlistener dzieki ktoremu po kliknieciu myszka na ekranie pojawia sie pocisk ktory zmierza wlasnie w wybranym kierunku
-window.addEventListener('click', (event) => {
-   if(!backgroundMusic.playing()) {
-    backgroundMusic.play()
-   }
+
+let audioInitialized = false
+
+function shoot({x, y}) {
     if(game.active) {
-    const projectileRadius = 5
-    const projectileColor = 'white'
-    const angle = Math.atan2(
-        event.clientY - player.y,
-        event.clientX - player.x
-    )
-    const velocity = {
-        x: Math.cos(angle) * 6,
-        y: Math.sin(angle) * 6
-    }
-    projectiles.push(new Projectile(
-        player.x,
-        player.y,
-        projectileRadius,
-        projectileColor,
-        velocity
-    ))
-    shootAudio.play()
-    }
+        const projectileRadius = 5
+        const projectileColor = 'white'
+        const angle = Math.atan2(
+            y - player.y,
+            x - player.x
+        )
+        const velocity = {
+            x: Math.cos(angle) * 6,
+            y: Math.sin(angle) * 6
+        }
+        projectiles.push(new Projectile(
+            player.x,
+            player.y,
+            projectileRadius,
+            projectileColor,
+            velocity
+        ))
+        audio.shootAudio.play()
+        }
+}
+window.addEventListener('click', (event) => {
+   if(!audio.backgroundMusic.playing() && !audioInitialized) {
+    audio.backgroundMusic.play()
+    audioInitialized = true
+   }
+    shoot({x:event.clientX,y:event.clientY})
+})
+window.addEventListener('touchstart', () => {
+    const x = event.touches[0].clientX
+    const y = event.touches[0].clientY
+
+    mouse.position.x = event.touches[0].clientX
+    mouse.position.y = event.touches[0].clientY
+
+    shoot({x,y})
 })
 const mouse = {
     position:{
@@ -344,11 +366,15 @@ addEventListener('mousemove', (event) => {
     mouse.position.x = event.clientX
     mouse.position.y = event.clientY
 })
+addEventListener('touchmove', (event) => {
+    mouse.position.x = event.touches[0].clientX
+    mouse.position.y = event.touches[0].clientY
+})
 // restart gry
 buttonEl.addEventListener('click', () => {
-    Select.play()
+    audio.Select.play()
     init()
-    animate()
+    animate() 
     spawnEnemies()
     spawnPowerUps()
     gsap.to('#modalEl' , {
@@ -363,7 +389,7 @@ buttonEl.addEventListener('click', () => {
 })
 // start gry
 startButtonEl.addEventListener('click', () => {
-    Select.play()
+    audio.Select.play()
     init()
     animate()
     spawnEnemies()
@@ -377,6 +403,45 @@ startButtonEl.addEventListener('click', () => {
             startGameEl.style.display = 'none'
         }
     })
+})
+// mute all
+volumeUpEl.addEventListener('click', () => {
+    audio.backgroundMusic.pause()
+    volumeDownEl.style.display = 'block'
+    volumeUpEl.style.display = 'none'
+    for (let key in audio) {
+        audio[key].mute(true)
+      }
+})
+//unmute all
+volumeDownEl.addEventListener('click', () => {
+    volumeDownEl.style.display = 'none'
+    volumeUpEl.style.display = 'block'
+      for (let key in audio) {
+        audio[key].mute(false)
+      }
+      if(audioInitialized) {audio.backgroundMusic.play()
+      }
+})
+
+window.addEventListener('resize', () => {
+    canvas.width = innerWidth
+    canvas.height = innerHeight
+
+    init()
+})
+document.addEventListener('visibilitychange', ()=> {
+    if (document.hidden) {
+        //inactive
+        //clearIntervals
+        clearInterval(intervalId)
+        clearInterval(spawnPowerUpsId)
+    } else {
+        // spawnEnmies spawnPowerUps
+        spawnEnemies()
+        spawnPowerUps()
+        
+    }
 })
 
 window.addEventListener('keydown', () => {
