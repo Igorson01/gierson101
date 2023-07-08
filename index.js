@@ -36,8 +36,8 @@ let game = {
 
 
 function init() {
-    const x = canvas.width / 2
-    const y = canvas.height / 2
+    const x = canvas.width / 2 
+    const y = canvas.height / 2 
 
     player = new Player(x, y , playerRadius, playerColor)
     projectiles = []
@@ -267,7 +267,7 @@ function animate() {
                 }
                 // tutaj zmniejszamy przeciwnikow
                 if(enemy.radius - 10 > 20) {
-                    score += 69
+                    score += 50
                     scoreEl.innerHTML = score
                     gsap.to(enemy,  {
                         radius: enemy.radius - 10
@@ -279,20 +279,20 @@ function animate() {
                             x:projectile.x,
                             y:projectile.y
                         },
-                        score : 69
+                        score : 50
                     })
                         audio.DamageTaken.play()
                         projectiles.splice(projectilesIndex, 1)
                 } else {
                 // a tutaj usuwamy przeciwnika i pocisk 
                 //dodajemy punkty za zniszenie przeciwnika
-                score += 420
+                score += 100
                 scoreEl.innerHTML = score
                 createScoreLabel({position :{
                     x: projectile.x,
                     y: projectile.y
                 },
-                score : 420
+                score : 100
             })
 
                     //zmieniamy kolor tla 
